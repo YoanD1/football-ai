@@ -16,6 +16,8 @@ def create_connection():
         print("Connection error:", e)
         return None
 
+def get_connection():
+    return sqlite3.connect("../sql/football.db")
 
 # =========================
 # INITIALIZE DATABASE
@@ -26,7 +28,7 @@ def initialize_database():
         return
 
     try:
-        with open("schema.sql", "r", encoding="utf-8") as f:
+        with open("../sql/schema.sql", "r", encoding="utf-8") as f:
             conn.executescript(f.read())
         print("Database schema created.")
     except Exception as e:
