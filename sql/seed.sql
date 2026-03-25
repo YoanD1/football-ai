@@ -1,53 +1,44 @@
 -- =========================
--- SEED DATA FOR ALL TABLES
+-- SEED DATA FOR FOOTBALL MANAGEMENT SYSTEM
 -- =========================
 
--- Clubs
-INSERT INTO Clubs (name, city, founded_year) VALUES
-('Levski Sofia', 'Sofia', 1914),
-('CSKA Sofia', 'Sofia', 1948),
-('Ludogorets', 'Razgrad', 2001),
-('Botev Plovdiv', 'Plovdiv', 1912),
-('Lokomotiv Plovdiv', 'Plovdiv', 1926);
+-- =========================
+-- CLUBS
+-- =========================
+INSERT INTO clubs (name, city) VALUES
+('Levski Sofia', 'Sofia'),
+('CSKA Sofia', 'Sofia'),
+('Ludogorets', 'Razgrad'),
+('Botev Plovdiv', 'Plovdiv'),
+('Lokomotiv Plovdiv', 'Plovdiv');
 
--- Players
-INSERT INTO Players (name, birth_date, nationality, position, number, club_id, status) VALUES
-('Ivan Petrov', '1999-05-12', 'BG', 'FW', 9, 1, 'active'),
-('Georgi Ivanov', '1995-08-20', 'BG', 'MF', 10, 2, 'active'),
-('Petar Dimitrov', '2000-02-15', 'BG', 'DF', 5, 3, 'active'),
-('Nikolay Stoyanov', '1993-11-01', 'BG', 'GK', 1, 4, 'active'),
-('Dimitar Kolev', '1997-07-30', 'BG', 'FW', 11, 5, 'active');
+-- =========================
+-- PLAYERS (distributed across clubs)
+-- =========================
+-- Levski Sofia (id=1)
+INSERT INTO players (full_name, birth_date, nationality, position, number, status, club_id) VALUES
+('Ivan Petrov', '1999-05-12', 'Bulgaria', 'FW', 9, 'active', 1),
+('Todor Markov', '1998-03-20', 'Bulgaria', 'MF', 10, 'active', 1);
 
--- Leagues
-INSERT INTO Leagues (name, season) VALUES
-('First League', '2025/2026');
+-- CSKA Sofia (id=2)
+INSERT INTO players (full_name, birth_date, nationality, position, number, status, club_id) VALUES
+('Georgi Ivanov', '1995-08-20', 'Bulgaria', 'DF', 5, 'active', 2),
+('Vasil Grozdev', '2000-11-15', 'Bulgaria', 'GK', 1, 'active', 2);
 
--- League Teams
-INSERT INTO League_Teams (league_id, club_id) VALUES
-(1, 1),
-(1, 2),
-(1, 3),
-(1, 4),
-(1, 5);
+-- Ludogorets (id=3)
+INSERT INTO players (full_name, birth_date, nationality, position, number, status, club_id) VALUES
+('Petar Dimitrov', '2000-02-15', 'Bulgaria', 'DF', 3, 'active', 3);
 
--- Matches
-INSERT INTO Matches (league_id, home_club_id, away_club_id, match_date, home_score, away_score) VALUES
-(1, 1, 2, '2025-03-01', 2, 1),
-(1, 3, 4, '2025-03-05', 3, 0),
-(1, 5, 1, '2025-03-10', 1, 1);
+-- Botev Plovdiv (id=4)
+INSERT INTO players (full_name, birth_date, nationality, position, number, status, club_id) VALUES
+('Nikolay Stoyanov', '1993-11-01', 'Bulgaria', 'MF', 8, 'active', 4);
 
--- Transfers
-INSERT INTO Transfers (player_id, from_club_id, to_club_id, transfer_date, amount) VALUES
-(1, 1, 3, '2025-01-15', 500000),
-(2, 2, 1, '2025-02-01', 300000);
-
--- Goals
-INSERT INTO Goals (match_id, player_id, minute) VALUES
-(1, 1, 23),
-(1, 2, 45),
-(2, 3, 10);
-
--- Cards
-INSERT INTO Cards (match_id, player_id, type, minute) VALUES
-(1, 2, 'yellow', 33),
-(2, 3, 'red', 77);
+-- =========================
+-- TRANSFERS
+-- =========================
+INSERT INTO transfers (player_id, from_club_id, to_club_id, transfer_date, fee, note) VALUES
+(1, 1, 3, '2025-01-15', 500000.00, 'Summer transfer'),
+(2, 2, 1, '2025-02-01', 300000.00, 'Mid-season transfer'),
+(3, 3, 2, '2025-01-20', 750000.00, 'Strategic acquisition'),
+(4, 4, 1, '2025-02-10', 250000.00, 'Youth development'),
+(5, 3, 4, '2025-03-05', 100000.00, 'Loan with purchase option');

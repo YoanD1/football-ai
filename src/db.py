@@ -1,117 +1,123 @@
 import sqlite3
+import os
 from sqlite3 import Error
+from typing import Optional, List, Tuple
 
+# =========================
+# DATABASE CONFIGURATION
+# =========================
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_NAME = "football.db"
+DB_PATH = os.path.join(BASE_DIR, DB_NAME)
 
 
 # =========================
-# CONNECTION
+# CONNECTION MANAGEMENT
 # =========================
-def create_connection():
+def get_connection() -> sqlite3.Connection:
+    """Get a connection to the SQLite database."""
     try:
-        conn = sqlite3.connect(DB_NAME)
-        print("Connected to SQLite database.")
+        conn = sqlite3.connect(DB_PATH)
+        conn.row_factory = sqlite3.Row  # Enable column access by name
         return conn
     except Error as e:
-        print("Connection error:", e)
+        print(f"❌ Connection error: {e}")
         return None
 
-def get_connection():
-    return sqlite3.connect("../sql/football.db")
 
-# =========================
-# INITIALIZE DATABASE
-# =========================
-def initialize_database():
-    conn = create_connection()
-    if conn is None:
-        return
-
-    try:
-        with open("../sql/schema.sql", "r", encoding="utf-8") as f:
-            conn.executescript(f.read())
-        print("Database schema created.")
-    except Exception as e:
-        print("Schema error:", e)
-
-    conn.close()
-
-
-# =========================
-# CRUD OPERATIONS – CLUBS
-# =========================
-
-# CREATE
-def add_club(name, city, founded_year):
-    conn = create_connection()
-    try:
-        sql = """INSERT INTO Clubs (name, city, founded_year)
-                 VALUES (?, ?, ?)"""
-        conn.execute(sql, (name, city, founded_year))
-        conn.commit()
-        print("Club added successfully.")
-    except Exception as e:
-        print("Insert error:", e)
-    finally:
+def close_connection(conn: sqlite3.Connection) -> None:
+    """Safely close database connection."""
+    if conn:
         conn.close()
 
 
-# READ (ALL)
-def get_all_clubs():
-    conn = create_connection()
+# =========================
+# DATABASE INITIALIZATION
+# =========================
+def initialize_database() -> bool:
+    """Initialize database with schema and seed data."""
     try:
+        conn = get_connection()
+        if conn is None:
+            return False
+
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM Clubs")
-        rows = cursor.fetchall()
 
-        print("\n--- Clubs ---")
-        for row in rows:
-            print(row)
+        # Read and execute schema
+        schema_path = os.path.join(os.path.dirname(BASE_DIR), "sql", "schema.sql")
+        with open(schema_path, "r", encoding="utf-8") as f:
+            cursor.executescript(f.read())
+
+        # Read and execute seed data
+        seed_path = os.path.join(os.path.dirname(BASE_DIR), "sql", "seed.sql")
+        with open(seed_path, "r", encoding="utf-8") as f:
+            cursor.executescript(f.read())
+
+        conn.commit()
+        conn.close()
+        print("✅ Database initialized successfully!")
+        return True
 
     except Exception as e:
-        print("Read error:", e)
-    finally:
-        conn.close()
+        print(f"❌ Database initialization error: {e}")
+        return False
 
 
-# READ (BY ID)
-def get_club_by_id(club_id):
-    conn = create_connection()
+# =========================
+# HELPER METHODS
+# =========================
+def execute_query(query: str, params: Tuple = ()) -> bool:
+    """Execute a write query (INSERT, UPDATE, DELETE)."""
     try:
+        conn = get_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM Clubs WHERE club_id = ?", (club_id,))
-        club = cursor.fetchone()
-        print(club)
-    except Exception as e:
-        print("Read error:", e)
-    finally:
-        conn.close()
-
-
-# UPDATE
-def update_club(club_id, name, city, founded_year):
-    conn = create_connection()
-    try:
-        sql = """UPDATE Clubs
-                 SET name = ?, city = ?, founded_year = ?
-                 WHERE club_id = ?"""
-        conn.execute(sql, (name, city, founded_year, club_id))
+        cursor.execute(query, params)
         conn.commit()
-        print("Club updated.")
-    except Exception as e:
-        print("Update error:", e)
-    finally:
         conn.close()
+        return True
+    except Error as e:
+        print(f"❌ Query error: {e}")
+        return False
 
 
-# DELETE
-def delete_club(club_id):
-    conn = create_connection()
+def fetch_one(query: str, params: Tuple = ()) -> Optional[sqlite3.Row]:
+    """Fetch a single row from database."""
     try:
-        conn.execute("DELETE FROM Clubs WHERE club_id = ?", (club_id,))
-        conn.commit()
-        print("Club deleted.")
-    except Exception as e:
-        print("Delete error:", e)
-    finally:
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute(query, params)
+        result = cursor.fetchone()
         conn.close()
+        return result
+    except Error as e:
+        print(f"❌ Fetch error: {e}")
+        return None
+
+
+def fetch_all(query: str, params: Tuple = ()) -> List[sqlite3.Row]:
+    """Fetch all rows from database."""
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute(query, params)
+        results = cursor.fetchall()
+        conn.close()
+        return results
+    except Error as e:
+        print(f"❌ Fetch error: {e}")
+        return []
+
+
+def get_last_insert_id(query: str, params: Tuple = ()) -> Optional[int]:
+    """Execute query and return last inserted row ID."""
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute(query, params)
+        conn.commit()
+        last_id = cursor.lastrowid
+        conn.close()
+        return last_id
+    except Error as e:
+        print(f"❌ Insert error: {e}")
+        return None

@@ -1,80 +1,61 @@
 -- =========================
--- SCHEMA.SQL
+-- FOOTBALL MANAGEMENT SYSTEM
+-- DATABASE SCHEMA
 -- =========================
 
-CREATE TABLE Clubs (
-    club_id INTEGER PRIMARY KEY AUTOINCREMENT,
+-- Drop existing tables (for clean initialization)
+DROP TABLE IF EXISTS transfers;
+DROP TABLE IF EXISTS players;
+DROP TABLE IF EXISTS clubs;
+
+-- =========================
+-- CLUBS TABLE
+-- =========================
+CREATE TABLE clubs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL UNIQUE,
     city TEXT NOT NULL,
-    founded_year INTEGER NOT NULL
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE Players (
-    player_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL,
-    birth_date TEXT,
-    nationality TEXT,
-    position TEXT NOT NULL,
-    number INTEGER,
+-- =========================
+-- PLAYERS TABLE
+-- =========================
+CREATE TABLE players (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    full_name TEXT NOT NULL,
+    birth_date TEXT NOT NULL,
+    nationality TEXT NOT NULL,
+    position TEXT NOT NULL CHECK(position IN ('GK', 'DF', 'MF', 'FW')),
+    number INTEGER NOT NULL CHECK(number >= 1 AND number <= 99),
+    status TEXT DEFAULT 'active' CHECK(status IN ('active', 'injured', 'inactive')),
     club_id INTEGER NOT NULL,
-    status TEXT,
-    FOREIGN KEY (club_id) REFERENCES Clubs(club_id)
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (club_id) REFERENCES clubs(id) ON DELETE RESTRICT
 );
 
-CREATE TABLE Leagues (
-    league_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL UNIQUE,
-    season TEXT NOT NULL
-);
-
-CREATE TABLE League_Teams (
-    league_team_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    league_id INTEGER NOT NULL,
-    club_id INTEGER NOT NULL,
-    FOREIGN KEY (league_id) REFERENCES Leagues(league_id),
-    FOREIGN KEY (club_id) REFERENCES Clubs(club_id)
-);
-
-CREATE TABLE Matches (
-    match_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    league_id INTEGER NOT NULL,
-    home_club_id INTEGER NOT NULL,
-    away_club_id INTEGER NOT NULL,
-    match_date TEXT NOT NULL,
-    home_score INTEGER,
-    away_score INTEGER,
-    FOREIGN KEY (league_id) REFERENCES Leagues(league_id),
-    FOREIGN KEY (home_club_id) REFERENCES Clubs(club_id),
-    FOREIGN KEY (away_club_id) REFERENCES Clubs(club_id)
-);
-
-CREATE TABLE Transfers (
-    transfer_id INTEGER PRIMARY KEY AUTOINCREMENT,
+-- =========================
+-- TRANSFERS TABLE
+-- =========================
+CREATE TABLE transfers (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     player_id INTEGER NOT NULL,
     from_club_id INTEGER,
-    to_club_id INTEGER,
-    transfer_date TEXT,
-    amount REAL,
-    FOREIGN KEY (player_id) REFERENCES Players(player_id),
-    FOREIGN KEY (from_club_id) REFERENCES Clubs(club_id),
-    FOREIGN KEY (to_club_id) REFERENCES Clubs(club_id)
+    to_club_id INTEGER NOT NULL,
+    transfer_date TEXT NOT NULL,
+    fee REAL,
+    note TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (player_id) REFERENCES players(id) ON DELETE CASCADE,
+    FOREIGN KEY (from_club_id) REFERENCES clubs(id) ON DELETE SET NULL,
+    FOREIGN KEY (to_club_id) REFERENCES clubs(id) ON DELETE RESTRICT,
+    CHECK(from_club_id IS NULL OR from_club_id != to_club_id)
 );
 
-CREATE TABLE Goals (
-    goal_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    match_id INTEGER NOT NULL,
-    player_id INTEGER NOT NULL,
-    minute INTEGER NOT NULL,
-    FOREIGN KEY (match_id) REFERENCES Matches(match_id),
-    FOREIGN KEY (player_id) REFERENCES Players(player_id)
-);
-
-CREATE TABLE Cards (
-    card_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    match_id INTEGER NOT NULL,
-    player_id INTEGER NOT NULL,
-    type TEXT NOT NULL, -- yellow/red
-    minute INTEGER NOT NULL,
-    FOREIGN KEY (match_id) REFERENCES Matches(match_id),
-    FOREIGN KEY (player_id) REFERENCES Players(player_id)
-);
+-- =========================
+-- INDEXES FOR PERFORMANCE
+-- =========================
+CREATE INDEX idx_players_club_id ON players(club_id);
+CREATE INDEX idx_players_full_name ON players(full_name);
+CREATE INDEX idx_transfers_player_id ON transfers(player_id);
+CREATE INDEX idx_transfers_transfer_date ON transfers(transfer_date);
