@@ -18,6 +18,17 @@ from transfers_service import (
     transfer_player, get_transfers_by_player,
     get_transfers_by_club, get_all_transfers
 )
+from handlers.handlers_leagues import (
+    handle_create_league, handle_add_club_to_league,
+    handle_remove_club_from_league, handle_show_clubs_in_league,
+    handle_show_all_leagues, handle_generate_schedule,
+    handle_regenerate_schedule, handle_show_schedule,
+    handle_league_info
+)
+from handlers.handlers_matches import (
+    handle_select_league, handle_select_match, handle_show_round,
+    handle_record_result, handle_add_goal, handle_add_card, handle_show_events
+)
 
 
 # =========================
@@ -105,11 +116,61 @@ def show_help() -> str:
   • Трансфери на клуб <КЛУБ>
     Example: Трансфери на клуб "Левски"
   
-  • Покажи всички трансфери
+   • Покажи всички трансфери
+
+⚽ LEAGUE MANAGEMENT:
+   • Създай лига "<ИМЕ>" "<СЕЗОН>"
+     Example: Създай лига "Първа лига" "2025/2026"
+   
+   • Добави отбор "<КЛУБ>" в лига "<ИМЕ>" "<СЕЗОН>"
+     Example: Добави отбор "Левски" в лига "Първа лига" "2025/2026"
+   
+   • Премахни отбор "<КЛУБ>" от лига "<ИМЕ>" "<СЕЗОН>"
+     Example: Премахни отбор "Левски" от лига "Първа лига" "2025/2026"
+   
+   • Покажи отбори в лига "<ИМЕ>" "<СЕЗОН>"
+     Example: Покажи отбори в лига "Първа лига" "2025/2026"
+   
+   • Покажи всички лиги
+   
+   • Генерирай програма "<ИМЕ>" "<СЕЗОН>"
+     Example: Генерирай програма "Първа лига" "2025/2026"
+   
+   • Прегенерирай програма "<ИМЕ>" "<СЕЗОН>"
+     Example: Прегенерирай програма "Първа лига" "2025/2026"
+   
+   • Покажи програма "<ИМЕ>" "<СЕЗОН>" [кръг <НОМЕР>]
+     Example: Покажи програма "Първа лига" "2025/2026"
+     Example: Покажи програма "Първа лига" "2025/2026" кръг 1
+   
+   • Инфо лига "<ИМЕ>" "<СЕЗОН>"
+     Example: Инфо лига "Първа лига" "2025/2026"
+
+🏆 MATCH MANAGEMENT:
+   • Избери лига "<ИМЕ>" "<СЕЗОН>"
+     Example: Избери лига "Първа лига" "2025/2026"
+   
+   • Избери мач <ИД_НА_МАЧА>
+     Example: Избери мач 12
+   
+   • Покажи кръг <НОМЕР> ["<ЛИГА>" "<СЕЗОН>"]
+     Example: Покажи кръг 3 "Първа лига" "2025/2026"
+   
+   • Резултат <ДОМАКИН>-<ГОСТ> <X>:<Y> запиши
+     Example: Резултат Левски-Ботев 3:0 запиши
+   
+   • Гол "<ИГРАЧ>" "<ОТБОР>" <МИНУТА> минута
+     Example: Гол "Иван Петров" "Левски" 23 минута
+   
+   • Картон "<ИГРАЧ>" "<ОТБОР>" <Y/R> <МИНУТА>
+     Example: Картон "Иван Петров" "Левски" Y 55
+   
+   • Покажи събития [MATCH_ID]
+     Example: Покажи събития 12
 
 ❓ GENERAL:
-  • помощ / help - Show this help menu
-  • изход / exit - Exit the program
+   • помощ / help - Show this help menu
+   • изход / exit - Exit the program
 
 ╔════════════════════════════════════════════════════════════════════════════╗
 """
@@ -363,6 +424,88 @@ def handle_input(user_input: str) -> str:
     if any(text.startswith(cmd) for cmd in intents["intents"]["transfer_player"]):
         result = handle_transfer_player(text)
         log_command(user_input, "transfer_player", result)
+        return result
+    
+    # LEAGUE COMMANDS
+    if any(text.startswith(cmd) for cmd in intents["intents"]["create_league"]):
+        result = handle_create_league(text)
+        log_command(user_input, "create_league", result)
+        return result
+    
+    if any(text.startswith(cmd) for cmd in intents["intents"]["add_club_to_league"]):
+        result = handle_add_club_to_league(text)
+        log_command(user_input, "add_club_to_league", result)
+        return result
+    
+    if any(text.startswith(cmd) for cmd in intents["intents"]["remove_club_from_league"]):
+        result = handle_remove_club_from_league(text)
+        log_command(user_input, "remove_club_from_league", result)
+        return result
+    
+    if any(text.startswith(cmd) for cmd in intents["intents"]["show_clubs_in_league"]):
+        result = handle_show_clubs_in_league(text)
+        log_command(user_input, "show_clubs_in_league", result)
+        return result
+    
+    if any(text.startswith(cmd) for cmd in intents["intents"]["show_all_leagues"]):
+        result = handle_show_all_leagues()
+        log_command(user_input, "show_all_leagues", result)
+        return result
+    
+    if any(text.startswith(cmd) for cmd in intents["intents"]["regenerate_schedule"]):
+        result = handle_regenerate_schedule(text)
+        log_command(user_input, "regenerate_schedule", result)
+        return result
+    
+    if any(text.startswith(cmd) for cmd in intents["intents"]["generate_schedule"]):
+        result = handle_generate_schedule(text)
+        log_command(user_input, "generate_schedule", result)
+        return result
+    
+    if any(text.startswith(cmd) for cmd in intents["intents"]["show_schedule"]):
+        result = handle_show_schedule(text)
+        log_command(user_input, "show_schedule", result)
+        return result
+    
+    if any(text.startswith(cmd) for cmd in intents["intents"]["league_info"]):
+        result = handle_league_info(text)
+        log_command(user_input, "league_info", result)
+        return result
+    
+    # MATCH COMMANDS
+    if any(text.startswith(cmd) for cmd in intents["intents"]["select_league"]):
+        result = handle_select_league(text)
+        log_command(user_input, "select_league", result)
+        return result
+    
+    if any(text.startswith(cmd) for cmd in intents["intents"]["select_match"]):
+        result = handle_select_match(text)
+        log_command(user_input, "select_match", result)
+        return result
+    
+    if any(text.startswith(cmd) for cmd in intents["intents"]["show_round"]):
+        result = handle_show_round(text)
+        log_command(user_input, "show_round", result)
+        return result
+    
+    if any(text.startswith(cmd) for cmd in intents["intents"]["record_result"]):
+        result = handle_record_result(text)
+        log_command(user_input, "record_result", result)
+        return result
+    
+    if any(text.startswith(cmd) for cmd in intents["intents"]["add_goal"]):
+        result = handle_add_goal(text)
+        log_command(user_input, "add_goal", result)
+        return result
+    
+    if any(text.startswith(cmd) for cmd in intents["intents"]["add_card"]):
+        result = handle_add_card(text)
+        log_command(user_input, "add_card", result)
+        return result
+    
+    if any(text.startswith(cmd) for cmd in intents["intents"]["show_events"]):
+        result = handle_show_events(text)
+        log_command(user_input, "show_events", result)
         return result
     
     # UNKNOWN COMMAND

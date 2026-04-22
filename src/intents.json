@@ -15,6 +15,22 @@
     "transfer_player": ["трансфер"],
     "list_transfers_by_player": ["покажи трансфери на"],
     "list_transfers_by_club": ["трансфери на клуб"],
-    "list_all_transfers": ["покажи всички трансфери"]
+    "list_all_transfers": ["покажи всички трансфери"],
+    "create_league": ["създай лига"],
+    "add_club_to_league": ["добави отбор"],
+    "remove_club_from_league": ["премахни отбор"],
+    "show_clubs_in_league": ["покажи отбори в лига"],
+    "show_all_leagues": ["покажи всички лиги"],
+    "generate_schedule": ["генерирай програма"],
+    "regenerate_schedule": ["прегенерирай програма"],
+    "show_schedule": ["покажи програма"],
+    "league_info": ["инфо лига"],
+    "select_league": ["избери лига"],
+    "select_match": ["избери мач"],
+    "show_round": ["покажи кръг"],
+    "record_result": ["резултат"],
+    "add_goal": ["гол"],
+    "add_card": ["картон"],
+    "show_events": ["покажи събития"]
   }
 }

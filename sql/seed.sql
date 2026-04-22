@@ -42,3 +42,28 @@ INSERT INTO transfers (player_id, from_club_id, to_club_id, transfer_date, fee, 
 (3, 3, 2, '2025-01-20', 750000.00, 'Strategic acquisition'),
 (4, 4, 1, '2025-02-10', 250000.00, 'Youth development'),
 (5, 3, 4, '2025-03-05', 100000.00, 'Loan with purchase option');
+
+-- =========================
+-- LEAGUES (Sample data for testing)
+-- =========================
+INSERT INTO leagues (name, season) VALUES
+('Primeira Liga', '2025/2026'),
+('Premier League', '2025/2026');
+
+-- =========================
+-- LEAGUE_TEAMS (Add clubs to leagues)
+-- =========================
+-- Primeira Liga: Levski, CSKA, Ludogorets, Botev
+INSERT INTO league_teams (league_id, club_id) VALUES
+(1, 1),
+(1, 2),
+(1, 3),
+(1, 4);
+
+-- Premier League: Levski, CSKA, Ludogorets, Lokomotiv
+INSERT INTO league_teams (league_id, club_id) VALUES
+(2, 1),
+(2, 2),
+(2, 3),
+(2, 5);
+

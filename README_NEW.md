@@ -113,6 +113,70 @@ The system will automatically:
 
 ---
 
+## ⚽ League Management System (Stage 5)
+
+### Overview
+The system now includes comprehensive league management with round-robin scheduling:
+- Create and manage leagues by season
+- Add/remove clubs to leagues
+- Automatic round-robin schedule generation
+- Match tracking and display
+- Full validation and error handling
+
+### Database Tables
+
+#### `leagues`
+| Column | Type | Constraints |
+|--------|------|-------------|
+| id | INTEGER | PRIMARY KEY, AUTOINCREMENT |
+| name | TEXT | NOT NULL |
+| season | TEXT | NOT NULL (format: YYYY/YYYY) |
+| created_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP |
+| Unique | (name, season) | Composite unique constraint |
+
+#### `league_teams`
+| Column | Type | Constraints |
+|--------|------|-------------|
+| league_id | INTEGER | FK → leagues.id |
+| club_id | INTEGER | FK → clubs.id |
+| joined_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP |
+| Primary Key | (league_id, club_id) | Composite PK |
+
+#### `matches`
+| Column | Type | Constraints |
+|--------|------|-------------|
+| id | INTEGER | PRIMARY KEY, AUTOINCREMENT |
+| league_id | INTEGER | FK → leagues.id |
+| round_no | INTEGER | NOT NULL |
+| home_club_id | INTEGER | FK → clubs.id |
+| away_club_id | INTEGER | FK → clubs.id |
+| match_date | TEXT | NULLABLE |
+| home_goals | INTEGER | NULLABLE |
+| away_goals | INTEGER | NULLABLE |
+| created_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP |
+
+**Constraints:**
+- `home_club_id != away_club_id` (no team plays itself)
+- No duplicate matches in same league/round
+- Cascade delete on league deletion
+
+### Round-Robin Algorithm
+
+**For even number of teams (N):**
+- Rounds: N - 1
+- Matches per round: N / 2
+- Total matches: N × (N-1) / 2
+- Each team plays every other team exactly once
+
+**For odd number of teams (N):**
+- Rounds: N
+- Matches per round: (N-1) / 2
+- Total matches: N × (N-1) / 2
+- One team has BYE (rest) per round
+- Guaranteed: No team plays itself, no duplicates
+
+---
+
 ## 📖 Commands Reference
 
 ### 🆘 General Commands
@@ -283,6 +347,99 @@ list clubs
 
 ---
 
+### ⚽ League Management
+
+#### Create League
+```
+Създай лига "<ИМЕ>" "<СЕЗОН>"
+```
+**Example:**
+```
+Създай лига "Първа лига" "2025/2026"
+```
+
+#### Add Club to League
+```
+Добави отбор "<КЛУБ>" в лига "<ИМЕ>" "<СЕЗОН>"
+```
+**Example:**
+```
+Добави отбор "Левски" в лига "Първа лига" "2025/2026"
+```
+
+#### Remove Club from League
+```
+Премахни отбор "<КЛУБ>" от лига "<ИМЕ>" "<СЕЗОН>"
+```
+**Example:**
+```
+Премахни отбор "Левски" от лига "Първа лига" "2025/2026"
+```
+**Note:** Only works if no schedule has been generated
+
+#### Show Clubs in League
+```
+Покажи отбори в лига "<ИМЕ>" "<СЕЗОН>"
+```
+**Example:**
+```
+Покажи отбори в лига "Първа лига" "2025/2026"
+```
+
+#### Show All Leagues
+```
+Покажи всички лиги
+```
+
+#### Generate Round-Robin Schedule
+```
+Генерирай програма "<ИМЕ>" "<СЕЗОН>"
+```
+**Example:**
+```
+Генерирай програма "Първа лига" "2025/2026"
+```
+
+**Requirements:**
+- Minimum 2 clubs in league
+- No schedule already exists
+- Season format must be YYYY/YYYY
+
+**Output:**
+- Creates all matches with round_no
+- Returns: Total rounds, matches, and sample first round
+
+#### Regenerate Schedule
+```
+Прегенерирай програма "<ИМЕ>" "<СЕЗОН>"
+```
+**Example:**
+```
+Прегенерирай програма "Първа лига" "2025/2026"
+```
+**Note:** Deletes existing schedule and generates new one
+
+#### Show Schedule
+```
+Покажи програма "<ИМЕ>" "<СЕЗОН>" [кръг <НОМЕР>]
+```
+**Examples:**
+```
+Покажи програма "Първа лига" "2025/2026"
+Покажи програма "Първа лига" "2025/2026" кръг 1
+```
+
+#### League Information
+```
+Инфо лига "<ИМЕ>" "<СЕЗОН>"
+```
+**Example:**
+```
+Инфо лига "Първа лига" "2025/2026"
+```
+
+---
+
 ## 📊 Sample Data
 
 The system comes with pre-loaded seed data:
@@ -312,6 +469,29 @@ The system comes with pre-loaded seed data:
 ---
 
 ## 💾 Data Validation
+
+### League Validation
+- ✓ League name must be non-empty
+- ✓ Season must be in YYYY/YYYY format
+- ✓ Name + Season must be unique
+- ✓ Minimum 2 clubs before schedule generation
+
+### League Team Validation
+- ✓ Club must exist in database
+- ✓ Club cannot be added twice to same league
+- ✓ Cannot remove club if schedule exists
+- ✓ Cannot add club if schedule exists
+
+### Schedule Validation
+- ✓ No team plays itself (home != away)
+- ✓ No duplicate matches in same round/league
+- ✓ Even N teams: N-1 rounds, N/2 matches per round
+- ✓ Odd N teams: N rounds, (N-1)/2 matches per round + BYE
+- ✓ Total matches: N×(N-1)/2
+
+---
+
+## 💾 Data Validation (Original)
 
 ### Club Validation
 - ✓ Name must be non-empty and unique
