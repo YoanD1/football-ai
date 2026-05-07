@@ -31,7 +31,7 @@ def create_league(name: str, season: str) -> Optional[int]:
 def get_league_by_name_and_season(name: str, season: str) -> Optional[sqlite3.Row]:
     """Get league by name and season."""
     return fetch_one(
-        "SELECT id, name, season, created_at FROM leagues WHERE name = ? AND season = ?",
+        "SELECT id, name, season, created_at FROM leagues WHERE LOWER(name) = LOWER(?) AND season = ?",
         (name, season)
     )
 
