@@ -29,6 +29,9 @@ from handlers.handlers_matches import (
     handle_select_league, handle_select_match, handle_show_round,
     handle_record_result, handle_add_goal, handle_add_card, handle_show_events
 )
+from handlers.handlers_standings import (
+    handle_show_standings
+)
 
 
 # =========================
@@ -167,6 +170,10 @@ def show_help() -> str:
    
    • Покажи събития [MATCH_ID]
      Example: Покажи събития 12
+
+🏆 STANDINGS MANAGEMENT:
+   • Покажи класиране "<ЛИГА>" "<СЕЗОН>"
+     Example: Покажи класиране "Първа лига" "2025/2026"
 
 ❓ GENERAL:
    • помощ / help - Show this help menu
@@ -506,6 +513,12 @@ def handle_input(user_input: str) -> str:
     if any(text.startswith(cmd) for cmd in intents["intents"]["show_events"]):
         result = handle_show_events(text)
         log_command(user_input, "show_events", result)
+        return result
+    
+    # STANDINGS COMMANDS
+    if any(text.startswith(cmd) for cmd in intents["intents"]["show_standings"]):
+        result = handle_show_standings(text)
+        log_command(user_input, "show_standings", result)
         return result
     
     # UNKNOWN COMMAND

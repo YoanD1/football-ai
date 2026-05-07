@@ -31,6 +31,7 @@
     "record_result": ["резултат"],
     "add_goal": ["гол"],
     "add_card": ["картон"],
-    "show_events": ["покажи събития"]
+    "show_events": ["покажи събития"],
+    "show_standings": ["покажи класиране"]
   }
 }
