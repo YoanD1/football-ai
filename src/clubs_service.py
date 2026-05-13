@@ -19,7 +19,7 @@ def add_club(name: str, city: str) -> str:
     city = city.strip()
 
     # Check if club already exists
-    if fetch_one("SELECT id FROM clubs WHERE name = ?", (name,)):
+    if get_club_by_name(name):
         return f"❌ Club '{name}' already exists."
 
     # Insert new club
@@ -52,9 +52,10 @@ def get_all_clubs() -> str:
 
 def get_club_by_name(name: str) -> Optional[dict]:
     """Get a club by name."""
-    club = fetch_one("SELECT id, name, city FROM clubs WHERE LOWER(name) = LOWER(?)", (name,))
-    if club:
-        return {"id": club[0], "name": club[1], "city": club[2]}
+    clubs = fetch_all("SELECT id, name, city FROM clubs")
+    for club in clubs:
+        if club[1].lower() == name.lower():
+            return {"id": club[0], "name": club[1], "city": club[2]}
     return None
 
 

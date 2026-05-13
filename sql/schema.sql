@@ -4,6 +4,8 @@
 -- =========================
 
 -- Drop existing tables (for clean initialization)
+DROP TABLE IF EXISTS cards;
+DROP TABLE IF EXISTS goals;
 DROP TABLE IF EXISTS matches;
 DROP TABLE IF EXISTS league_teams;
 DROP TABLE IF EXISTS leagues;
@@ -159,4 +161,3 @@ CREATE INDEX idx_goals_minute ON goals(minute);
 CREATE INDEX idx_cards_match_id ON cards(match_id);
 CREATE INDEX idx_cards_player_id ON cards(player_id);
 CREATE INDEX idx_cards_minute ON cards(minute);
-

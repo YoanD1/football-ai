@@ -6,11 +6,11 @@
 -- CLUBS
 -- =========================
 INSERT INTO clubs (name, city) VALUES
-('Levski Sofia', 'Sofia'),
-('CSKA Sofia', 'Sofia'),
-('Ludogorets', 'Razgrad'),
-('Botev Plovdiv', 'Plovdiv'),
-('Lokomotiv Plovdiv', 'Plovdiv');
+('Левски София', 'София'),
+('ЦСКА София', 'София'),
+('Лудогорец', 'Разград'),
+('Ботев Пловдив', 'Пловдив'),
+('Локомотив Пловдив', 'Пловдив');
 
 -- =========================
 -- PLAYERS (distributed across clubs)
@@ -66,4 +66,3 @@ INSERT INTO league_teams (league_id, club_id) VALUES
 (2, 2),
 (2, 3),
 (2, 5);
-
